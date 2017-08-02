@@ -17,7 +17,8 @@ class ChessEngine {
 
         // Config
         await ce.engine.setoption('Threads', `${os.cpus().length}`)
-        await ce.engine.setoption('Minimum Thinking Time', '1000')
+        // DOU U WANT THIS ROBOT TO BE A DUMB ASS?
+        // await ce.engine.setoption('Skill Level', `0`)
 
         // Wait for ready
         await ce.engine.isready()
@@ -31,13 +32,15 @@ class ChessEngine {
         return this.chess.fen()
     }
 
-    async computeRobotMove(fen) {
-        return new Promise(async resolve => {
-            if (fen !== undefined)
-                await this.engine.position(fen)
-            const result = await this.engine.go({ nodes: 2500000 })
-            resolve(result.bestmove)
-        })
+    async computeRobotMove() {
+        const fen = await this.chess.fen()
+        if (fen !== undefined)
+            await this.engine.position(fen)
+        const startComputeTime = Date.now()
+        const result = await this.engine.go({ nodes: 2500000 })
+        console.log(`Robot played in ${(Date.now() - startComputeTime) / 1000}s`)
+        this.chess.move(result.bestmove, { sloppy: true })
+        return this.chess.fen()
     }
 
     async kill() {
