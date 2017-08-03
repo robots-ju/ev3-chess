@@ -2,6 +2,7 @@ package ch.wisteca.robot;
 
 import ch.wisteca.robot.connection.Packet;
 import ch.wisteca.robot.connection.PacketListener;
+import ch.wisteca.robot.motors.YMotor;
 
 /**
  * Singleton qui interprète les commandes envoyées au serveur pour faire bouger les moteurs.
@@ -19,6 +20,7 @@ public class MotorController implements PacketListener {
 	public MotorController()
 	{
 		myInstance = this;
+		new YMotor();
 	}
 	
 	@Override
