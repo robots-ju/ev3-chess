@@ -5,7 +5,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
-import lejos.hardware.sensor.EV3TouchSensor;
+import lejos.hardware.sensor.NXTTouchSensor;
 
 /**
  * Interface qui gère les moteurs de déplacements du chariot (axes x et z).
@@ -16,7 +16,7 @@ public class XZMotor extends Motor {
 	private EV3MediumRegulatedMotor myMedium;
 	private EV3LargeRegulatedMotor myLarge1, myLarge2;
 	
-	private EV3TouchSensor myXRightSensor, myXLeftSensor, myZSensor;
+	private NXTTouchSensor myXRightSensor, myXLeftSensor, myZSensor;
 	private float[] myXRightSample, myXLeftSample, myZSample;
 	
 	private Vector2D myCurrentPosition;
@@ -32,16 +32,16 @@ public class XZMotor extends Motor {
 		
 		myLarge1.synchronizeWith(new EV3LargeRegulatedMotor[] {myLarge2});
 		
-		myXRightSensor = new EV3TouchSensor(SensorPort.S1);
+		myXRightSensor = new NXTTouchSensor(SensorPort.S1);
 		myXRightSample = new float[myXRightSensor.sampleSize()];
-		myXLeftSensor = new EV3TouchSensor(SensorPort.S2);
+		myXLeftSensor = new NXTTouchSensor(SensorPort.S2);
 		myXLeftSample = new float[myXRightSensor.sampleSize()];
-		myZSensor = new EV3TouchSensor(SensorPort.S3);
+		myZSensor = new NXTTouchSensor(SensorPort.S3);
 		myZSample = new float[myXRightSensor.sampleSize()];
 		
-		myLarge1.setSpeed(100);
-		myLarge2.setSpeed(100);
-		myMedium.setSpeed(100);
+		myLarge1.setSpeed(300);
+		myLarge2.setSpeed(300);
+		myMedium.setSpeed(300);
 		
 		myLarge1.startSynchronization();
 		myLarge1.forward();
@@ -54,7 +54,7 @@ public class XZMotor extends Motor {
 			myXLeftSensor.fetchSample(myXLeftSample, 0);
 			myXRightSensor.fetchSample(myXRightSample, 0);
 			myZSensor.fetchSample(myZSample, 0);
-			
+			System.out.println("sample : " + myXLeftSample[0]);
 			if(myXLeftSample[0] == 1 || myXRightSample[0] == 1)
 			{
 				myLarge1.startSynchronization();
@@ -66,7 +66,7 @@ public class XZMotor extends Motor {
 			if(myZSample[0] == 1)
 				myMedium.stop();
 			
-			if(myLarge1.isMoving() == false || myMedium.isMoving() == false)
+			if(myLarge1.isMoving() == false && myMedium.isMoving() == false)
 				break;
 		}
 		

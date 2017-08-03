@@ -21,7 +21,7 @@ import lejos.utility.Delay;
 public class YMotor extends Motor {
 
 	// le nbr de degré pour inverser la manette
-	private final static int moveController = 30;
+	private final static int moveController = 90;
 
 	private RegulatedMotor	motorPince;
 	private RegulatedMotor motorDescendPince;
@@ -32,6 +32,7 @@ public class YMotor extends Motor {
 
 	public YMotor() {
 		// connection à la seconde brique
+		
 		try {
 			brique[0] = new RemoteRequestEV3(BrickFinder.find("EV2")[0].getIPAddress());
 		} catch (IOException e) {
@@ -39,9 +40,9 @@ public class YMotor extends Motor {
 			e.printStackTrace();
 		}
 		
-		motorPince = brique[1].createRegulatedMotor("A", 'L');
-		motorDescendPince = brique[1].createRegulatedMotor("B", 'L');
-		motorPump = brique[1].createRegulatedMotor("C", 'M');
+		motorPince = brique[0].createRegulatedMotor("A", 'L');
+		motorDescendPince = brique[0].createRegulatedMotor("B", 'L');
+		motorPump = brique[0].createRegulatedMotor("C", 'M');
 		
 		motorPince.setSpeed(100);
 		motorDescendPince.setSpeed(100);
@@ -56,17 +57,17 @@ public class YMotor extends Motor {
 	 */
 	public void clamp() {
 		// ouvre la pince
-		motorPince.rotate(moveController);
+		motorPince.rotate(-moveController);
 		// dessend le bras
 		// attends que la pince ouverte
-		Delay.msDelay(2000);
-		motorDescendPince.rotate(moveController);
-		Delay.msDelay(5000);
-		// ferme la pince
-		motorPince.rotate(-moveController);
-		// remonte le moteur
-		Delay.msDelay(2000);
+		Delay.msDelay(100);
 		motorDescendPince.rotate(-moveController);
+		Delay.msDelay(100);
+		// ferme la pince
+		motorPince.rotate(moveController);
+		// remonte le moteur
+		Delay.msDelay(200);
+		motorDescendPince.rotate(moveController);
 
 	}
 
@@ -76,14 +77,14 @@ public class YMotor extends Motor {
 	public void unclamp() {
 		
 		// dessend le bras
-		motorDescendPince.rotate(moveController);
-		Delay.msDelay(5000);
-		// ouvre la pince
-		motorPince.rotate(moveController);
-		// remonte le moteur
-		Delay.msDelay(2000);
 		motorDescendPince.rotate(-moveController);
-		// ferme la pince
+		Delay.msDelay(200);
+		// ouvre la pince
 		motorPince.rotate(-moveController);
+		// remonte le moteur
+		Delay.msDelay(100);
+		motorDescendPince.rotate(moveController);
+		// ferme la pince
+		motorPince.rotate(moveController);
 	}
 }

@@ -3,6 +3,7 @@ package ch.wisteca.robot;
 import ch.wisteca.robot.connection.Packet;
 import ch.wisteca.robot.connection.PacketListener;
 import ch.wisteca.robot.motors.YMotor;
+import lejos.hardware.Sound;
 
 /**
  * Singleton qui interprète les commandes envoyées au serveur pour faire bouger les moteurs.
@@ -20,7 +21,11 @@ public class MotorController implements PacketListener {
 	public MotorController()
 	{
 		myInstance = this;
-		new YMotor();
+		YMotor motor = new YMotor();
+		motor.clamp();
+		Sound.beepSequence();
+		motor.unclamp();
+		//new XZMotor();
 	}
 	
 	@Override
