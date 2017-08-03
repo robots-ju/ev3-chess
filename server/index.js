@@ -28,7 +28,17 @@ const BrickControl = require('./brick-control')
         client.on('playerMove', async ({ move }) => {
             console.log('Player moved')
             client.emit('gameChange', { fen: await chessEngine.playerMove(move) })
-            
+
+            for (let move of chessEngine.brickMoves()) {
+                console.log('Sending move to brick', move)
+                try {
+                    await brickControl.move(move);
+                } catch(err) {
+                    console.log('Brick move error', err)
+                }
+                console.log('Brick is finished')
+            }
+
             // ROBOT PLAYS AFTER THE PLAYER
             const fen = await chessEngine.computeRobotMove()
             client.emit('gameChange', { fen })

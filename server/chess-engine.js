@@ -32,6 +32,54 @@ class ChessEngine {
         return this.chess.fen()
     }
 
+    brickMoves() {
+        const history = this.chess.history({ verbose: true })
+        const lastMove = history[history.length - 1]
+
+        if (lastMove.san.indexOf('O-O') !== -1) {
+            let rookFrom = null;
+            let rookTo = null;
+
+            switch (true) {
+                case lastMove.color === 'w' && lastMove.san === 'O-O':
+                    rookFrom = 'h1'
+                    rookTo = 'f1'
+                    break;
+                case lastMove.color === 'w' && lastMove.san === 'O-O-O':
+                    rookFrom = 'a1'
+                    rookTo = 'd1'
+                    break;
+                case lastMove.color === 'b' && lastMove.san === 'O-O':
+                    rookFrom = 'h8'
+                    rookTo = 'f8'
+                    break;
+                case lastMove.color === 'b' && lastMove.san === 'O-O-O':
+                    rookFrom = 'a8'
+                    rookTo = 'd8'
+                    break;
+                default:
+                    console.log('Invalid rook situation', lastMove)
+                    return []
+            }
+
+            return [{
+                from: lastMove.from,
+                to: lastMove.to,
+                capture: false,
+            }, {
+                from: rookFrom,
+                to: rookTo,
+                capture: false,
+            }]
+        } else {
+            return [{
+                from: lastMove.from,
+                to: lastMove.to,
+                capture: !!lastMove.captured,
+            }]
+        }
+    }
+
     async computeRobotMove() {
         const fen = await this.chess.fen()
         if (fen !== undefined)

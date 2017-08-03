@@ -55,19 +55,19 @@ class BrickControl {
         return parseInt(position.charAt(1)) - 1
     }
 
-    move(start, end, capture) {
+    move(move) {
         return new Promise((resolve, reject) => {
             const buffer = Buffer.from([
-                this.columnToByte(start),
-                this.lineToByte(start),
-                this.columnToByte(end),
-                this.lineToByte(end),
-                capture ? 1 : 0,
+                this.columnToByte(move.from),
+                this.lineToByte(move.from),
+                this.columnToByte(move.to),
+                this.lineToByte(move.to),
+                move.capture ? 1 : 0,
             ])
 
             if (!this.socket) {
-                console.log('Move: No TCP socket !')
-                return reject()
+                reject('No TCP socket')
+                return
             }
 
             this.socket.write(buffer)
