@@ -9,7 +9,7 @@ const BrickControl = require('./brick-control')
 ; (async () => {
     // CHESS
     const chessEngine = await ChessEngine.init()
-    const brickControl = BrickControl.init(4000)
+    const brickControl = BrickControl.init('192.168.0.26', 4000)
 
     // HTTP
     httpServer.on('request', (req, res) => {

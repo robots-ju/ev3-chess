@@ -7,28 +7,19 @@ class BrickControl {
         this.resolveMove = null
     }
 
-    static init(port) {
+    static init(host, port) {
         const control = new BrickControl()
 
-        const tcp = net.createServer(socket => {
-            control.configureSocket(socket)
+        const socket = net.createConnection({host, port}, () => {
+            console.log('TCP client connected to ' + host + ':' + port)
         })
 
-        tcp.listen(port, () => {
-            console.log('TCP serveur bound to :' + port)
-        })
-
-        tcp.on('err', err => {
-            this.socket = null
-            throw err
-        })
+        control.configureSocket(socket)
 
         return control;
     }
 
     configureSocket(socket) {
-        console.log('TCP client connected')
-
         this.socket = socket
 
         this.socket.on('end', () => {
@@ -44,6 +35,11 @@ class BrickControl {
             } else {
                 console.log('No move to resolve')
             }
+        })
+
+        this.socket.on('err', err => {
+            this.socket = null
+            throw err
         })
     }
 
