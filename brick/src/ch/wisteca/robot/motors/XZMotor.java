@@ -19,12 +19,6 @@ public class XZMotor extends Motor {
 		
 	}
 	
-	@Override
-	public void initialPosition()
-	{
-		
-	}
-	
 	/**
 	 * Fait bouger le chariot sur la case demandée.
 	 */

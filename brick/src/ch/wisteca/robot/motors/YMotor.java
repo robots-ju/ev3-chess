@@ -11,12 +11,6 @@ public class YMotor extends Motor {
 		
 	}
 	
-	@Override
-	public void initialPosition() 
-	{
-		
-	}
-	
 	/**
 	 * Fait descendre la pince puis la serre.
 	 */
