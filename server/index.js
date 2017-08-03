@@ -3,11 +3,13 @@ const http = require('http')
 const io = require('socket.io')
 
 const ChessEngine = require('./chess-engine')
-const httpServer = http.createServer();
+const httpServer = http.createServer()
+const BrickControl = require('./brick-control')
 
-(async () => {
+; (async () => {
     // CHESS
     const chessEngine = await ChessEngine.init()
+    const brickControl = BrickControl.init(4000)
 
     // HTTP
     httpServer.on('request', (req, res) => {
