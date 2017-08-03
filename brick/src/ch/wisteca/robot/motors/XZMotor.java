@@ -13,6 +13,11 @@ import lejos.hardware.sensor.NXTTouchSensor;
  */
 public class XZMotor extends Motor {
 
+	private static final float DEGRE_ZONE_VIDE = 666;
+	private static final float DEGRE_CASE_X = 331.625f;
+	private static final float DEGRE_CASE_Z = 269.875f;
+	private static final char[] LETTRES = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+	
 	private EV3MediumRegulatedMotor myMedium;
 	private EV3LargeRegulatedMotor myLarge1, myLarge2;
 	
@@ -54,7 +59,7 @@ public class XZMotor extends Motor {
 			myXLeftSensor.fetchSample(myXLeftSample, 0);
 			myXRightSensor.fetchSample(myXRightSample, 0);
 			myZSensor.fetchSample(myZSample, 0);
-			System.out.println("sample : " + myXLeftSample[0]);
+			
 			if(myXLeftSample[0] == 1 || myXRightSample[0] == 1)
 			{
 				myLarge1.startSynchronization();
@@ -78,6 +83,32 @@ public class XZMotor extends Motor {
 	 */
 	public void goTo(char ligne, int colonne)
 	{
+		int caseLigne = 0;
+		for(int i = 0 ; i < LETTRES.length ; i++)
+		{
+			if(LETTRES[i] == ligne)
+			{
+				caseLigne = i;
+				break;
+			}
+		}
 		
+		float x = DEGRE_ZONE_VIDE + (caseLigne * DEGRE_CASE_X);
+		float z = colonne * DEGRE_CASE_Z;
+		Vector2D toGo = new Vector2D(x, z);
+		Vector2D deplacement = toGo.add(myCurrentPosition);
+		
+		myLarge1.startSynchronization();
+		int depX = Math.round(deplacement.x);
+		myLarge1.rotate(depX);
+		myLarge2.rotate(depX);
+		myLarge1.endSynchronization();
+		myMedium.rotate(Math.round(deplacement.y));
+		
+		while(true)
+		{
+			if(myLarge1.isMoving() == false && myMedium.isMoving() == false)
+				break;
+		}
 	}
 }
