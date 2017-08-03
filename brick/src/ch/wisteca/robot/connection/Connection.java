@@ -7,12 +7,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import ch.wisteca.robot.MainClass;
+import ch.wisteca.robot.MainThreadListener;
+
 /**
  * Singleton qui s'occupe de la connexion avec le client de jeu.
  * Cette classe est thread safe.
  * @author Wisteca
  */
-public class Connection {
+public class Connection implements MainThreadListener {
 
 	private static Connection myInstance;
 	
@@ -20,6 +23,7 @@ public class Connection {
 	private boolean myConnected;
 	
 	private ConcurrentLinkedQueue<String> myPacketsToSend = new ConcurrentLinkedQueue<>();
+	private ConcurrentLinkedQueue<Packet> myPacketsToCall = new ConcurrentLinkedQueue<>();
 	private ConcurrentLinkedQueue<PacketListener> myListeners = new ConcurrentLinkedQueue<>();
 	
 	/**
@@ -56,6 +60,8 @@ public class Connection {
 		System.out.println("En attente de connexion...");
 		myClient = server.accept();
 		
+		MainClass.addListener(this);
+		
 		myConnected = true;
 		new PacketSender();
 		new PacketReceiver();
@@ -73,7 +79,7 @@ public class Connection {
 	
 	/**
 	 * Envoit un packet au client.
-	 * Un client doit Ãªtre connectÃ© au serveur ! Voir : {@link Connection#isConnected()}
+	 * Un client doit être connecte au serveur ! Voir : {@link Connection#isConnected()}
 	 */
 	public void sendPacket(String packet)
 	{
@@ -86,6 +92,23 @@ public class Connection {
 	public boolean isConnected()
 	{
 		return myClient != null && myClient.isClosed() == false;
+	}
+	
+	/**
+	 * Méthode appelée par le thread main.
+	 */
+	@Override
+	public void onCall()
+	{
+		while(true)
+		{
+			Packet packet = myPacketsToCall.poll();
+			if(packet == null)
+				break;
+			
+			for(PacketListener listener : myListeners)
+				listener.packetReceived(packet);
+		}
 	}
 	
 	private void disconnect()
@@ -153,8 +176,7 @@ public class Connection {
 					packet.myNumArrive = ((int) bytes[3]) + 1;
 					packet.myCapture = bytes[4] == 0 ? false : true;
 					 
-					for(PacketListener listener : myListeners)
-						listener.packetReceived(packet);
+					myPacketsToCall.add(packet);
 					
 				} catch (IOException ex) {
 					break;
