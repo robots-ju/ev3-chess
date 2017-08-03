@@ -16,6 +16,7 @@ import lejos.utility.Delay;
  * Interface permettant de gèrer le moteur de l'axe y et la pince.
  * 
  * @author Astreptocoque
+ * au début, la pince est en haut et fermée
  */
 
 public class YMotor extends Motor {
@@ -49,6 +50,9 @@ public class YMotor extends Motor {
 		//active le moteur de la pompe
 		motorPump.setSpeed(1200);
 		motorPump.forward();
+		// ouvre la pince
+		motorPince.rotate(-moveController);
+
 
 	}
 
@@ -56,8 +60,6 @@ public class YMotor extends Motor {
 	 * Fait descendre la pince puis la serre.
 	 */
 	public void clamp() {
-		// ouvre la pince
-		motorPince.rotate(-moveController);
 		// dessend le bras
 		// attends que la pince ouverte
 		Delay.msDelay(100);
@@ -84,7 +86,5 @@ public class YMotor extends Motor {
 		// remonte le moteur
 		Delay.msDelay(100);
 		motorDescendPince.rotate(moveController);
-		// ferme la pince
-		motorPince.rotate(moveController);
 	}
 }
