@@ -1,8 +1,7 @@
 package ch.wisteca.robot.connection;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -94,8 +93,9 @@ public class Connection {
 		if(myConnected)
 		{
 			myConnected = false;
+			Packet packet = new Packet();
 			for(PacketListener listener : myListeners)
-				listener.packetReceived("disconnect");
+				listener.packetReceived(packet); // Envoi d'un paquet vide pour signaler la déconnexion.
 		}
 	}
 	
@@ -128,11 +128,11 @@ public class Connection {
 	
 	private class PacketReceiver implements Runnable {
 		
-		private BufferedReader myReader;
+		private DataInputStream myDataReader;
 		
 		public PacketReceiver() throws IOException 
 		{
-			myReader = new BufferedReader(new InputStreamReader(myClient.getInputStream()));
+			myDataReader = new DataInputStream(myClient.getInputStream());
 			new Thread(this, "PacketReceiver").start();
 		}
 		
@@ -143,10 +143,16 @@ public class Connection {
 			{
 				try {
 					
-					String packet = myReader.readLine();
-					if(packet == null)
-						continue;
+					byte[] bytes = new byte[5];
+					myDataReader.read(bytes);
 					
+					Packet packet = new Packet();
+					packet.myLettreDepart = (char) (97 + bytes[0]);
+					packet.myNumDepart = ((int) bytes[1]) + 1;
+					packet.myLettreArrive = (char) (97 + bytes[2]);
+					packet.myNumArrive = ((int) bytes[3]) + 1;
+					packet.myCapture = bytes[4] == 0 ? false : true;
+					 
 					for(PacketListener listener : myListeners)
 						listener.packetReceived(packet);
 					

@@ -11,8 +11,7 @@ public class MainClass  {
 		
 		while(true)
 		{
-			Thread.sleep(500);
-			Connection.getInstance().sendPacket("bonsoir");
+			
 		}
 	}
 }

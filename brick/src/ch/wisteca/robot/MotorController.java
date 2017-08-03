@@ -1,5 +1,6 @@
 package ch.wisteca.robot;
 
+import ch.wisteca.robot.connection.Packet;
 import ch.wisteca.robot.connection.PacketListener;
 
 /**
@@ -21,7 +22,7 @@ public class MotorController implements PacketListener {
 	}
 	
 	@Override
-	public void packetReceived(String packet) 
+	public void packetReceived(Packet packet) 
 	{
 		System.out.println(packet);
 	}

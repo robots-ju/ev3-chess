@@ -1,15 +1,15 @@
 package ch.wisteca.robot.connection;
 
 /**
- * Interface implÃ©mentant une mÃ©thode de callback. 
+ * Interface implémentant une méthode de callback. 
  * @author Wisteca
  */
 public interface PacketListener {
 
 	/**
-	 * Callback appelÃ© lorsqu'un packet est reÃ§u du client.
+	 * Callback appelée lorsqu'un packet est reçu du client.
 	 * @param packet le contenu du packet
 	 */
-	public void packetReceived(String packet);
+	public void packetReceived(Packet packet);
 	
 }
