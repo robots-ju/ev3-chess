@@ -7,25 +7,26 @@
     <title>Chess</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="css/chessboard-0.3.0.min.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <div id="app">
         <div>{{ currentPlayer() }} is playing</div>
-        <div class="alert alert-danger" v-if="game.game_over()">
+        <div class="over" v-if="game.game_over()">
             <strong>Game Over</strong>
             <div v-if="game.in_checkmate()">Checkmate !</div>
             <div v-if="game.in_draw()">Draw !</div>
         </div>
-        <div class="alert alert-warning" v-if="game.in_check()">{{ currentPlayer() }} is in check !</div>
+        <div class="check" v-if="game.in_check()">{{ currentPlayer() }} is in check !</div>
     </div>
-    <div id="board" style="width: 400px;"></div>
+    <div id="board" style="width: 600px;"></div>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="js/chessboard-0.3.0.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://unpkg.com/vue"></script>
     <script>
-        const socket = io.connect('http://192.168.8.101:8080');
+        const socket = io.connect('http://192.168.8.103:8080');
 
         const app = new Vue({
             el: '#app',
