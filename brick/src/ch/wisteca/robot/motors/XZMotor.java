@@ -2,7 +2,7 @@ package ch.wisteca.robot.motors;
 
 import ch.wisteca.robot.captor.TouchCaptor;
 import ch.wisteca.robot.captor.TouchCaptorListener;
-import ch.wisteca.robot.math.Vector2D;
+import ch.wisteca.robot.math.Vec2;
 import lejos.hardware.motor.BaseRegulatedMotor;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
@@ -15,17 +15,16 @@ import lejos.hardware.port.SensorPort;
  */
 public class XZMotor extends Motor implements TouchCaptorListener {
 
-	private static final float DEGRE_ZONE_VIDE = 666;
-	private static final float DEGRE_CASE_X = 331.625f;
-	private static final float DEGRE_CASE_Z = 269.875f;
-	private static final char[] LETTRES = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+	private static final float DEGRE_ZONE_VIDE = 780f;
+	private static final float DEGRE_CASE_X = 380f;
+	private static final float DEGRE_CASE_Z = 310f;
 	
 	private EV3MediumRegulatedMotor myMedium;
 	private EV3LargeRegulatedMotor myLarge1, myLarge2;
 	
 	private TouchCaptor myXRightSensor, myXLeftSensor, myZSensor;
 	
-	private Vector2D myCurrentPosition;
+	private Vec2 myCurrentPosition;
 	
 	/**
 	 * Initialise les moteurs et capteurs puis ramène le chariot à sa position initiale.
@@ -42,46 +41,51 @@ public class XZMotor extends Motor implements TouchCaptorListener {
 		myXLeftSensor = new TouchCaptor(SensorPort.S2);
 		myZSensor = new TouchCaptor(SensorPort.S3);
 		
-		rotateX(true, 300);
-		rotateZ(true, 300);
-		waitUntilStop(myLarge1, myLarge2, myMedium);
+		myXRightSensor.addListener(this);
+		myXLeftSensor.addListener(this);
+		myZSensor.addListener(this);
 		
-		myCurrentPosition = new Vector2D(0);
+		myCurrentPosition = new Vec2(0);
+		goTo(0, 0);
 	}
 	
 	/**
 	 * Fait bouger le chariot sur la case demandée.
 	 */
-	public void goTo(char ligne, int colonne)
+	public void goTo(int ligne, int colonne)
 	{
-		if(ligne == 'Z' && colonne == 0) // retour 0 ; 0
+		if(ligne == 0 && colonne == 0) // retour 0 ; 0
 		{
-			rotateX(true, 500);
-			rotateZ(true, 500);
+			if(myCurrentPosition.x > 0 && myCurrentPosition.y > 0)
+			{
+				rotateX(800, (int) myCurrentPosition.x - 200);
+				rotateZ(800, (int) myCurrentPosition.y - 200);
+				waitUntilStop(myLarge1, myLarge2, myMedium);
+			}
+			
+			rotateX(true, 200);
+			rotateZ(true, 200);
 			waitUntilStop(myLarge1, myLarge2, myMedium);
+			
 			return;
 		}
 		
-		int caseLigne = 0;
-		for(int i = 0 ; i < LETTRES.length ; i++)
-		{
-			if(LETTRES[i] == ligne)
-			{
-				caseLigne = i;
-				break;
-			}
-		}
+		ligne -= 1;
+		colonne -= 1;
 		
-		float x = DEGRE_ZONE_VIDE + (caseLigne * DEGRE_CASE_X);
+		float x = DEGRE_ZONE_VIDE + (ligne * DEGRE_CASE_X);
 		float z = colonne * DEGRE_CASE_Z;
-		Vector2D toGo = new Vector2D(x, z);
-		Vector2D deplacement = myCurrentPosition.add(toGo);
 		
-		rotateX(Math.round(deplacement.length() / deplacement.normalize().x * 300), Math.round(deplacement.x));
-		rotateZ(Math.round(deplacement.length() / deplacement.normalize().y * 300), Math.round(deplacement.y));
+		Vec2 toGo = new Vec2(x, z);
+		Vec2 deplacement = toGo.sub(myCurrentPosition);
+		
+		rotateX(Math.round(deplacement.normalize().x * 600), -Math.round(deplacement.x));
+		rotateZ(Math.round(deplacement.normalize().y * 600), -Math.round(deplacement.y));
 		waitUntilStop(myLarge1, myLarge2, myMedium);
 		myCurrentPosition.x = toGo.x;
 		myCurrentPosition.y = toGo.y;
+		
+		System.out.println("x: " + myCurrentPosition.x + " y: " + myCurrentPosition.y);
 	}
 	
 	private void rotateX(boolean forward, int speed)
@@ -140,6 +144,10 @@ public class XZMotor extends Motor implements TouchCaptorListener {
 	{
 		while(true)
 		{
+			myXLeftSensor.onCall();
+			myXRightSensor.onCall();
+			myZSensor.onCall();
+			
 			boolean flag = true;
 			for(BaseRegulatedMotor motor : motors)
 			{
@@ -172,24 +180,5 @@ public class XZMotor extends Motor implements TouchCaptorListener {
 	
 	@Override
 	public void onUnPush(TouchCaptor captor)
-	{}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	{}	
 }

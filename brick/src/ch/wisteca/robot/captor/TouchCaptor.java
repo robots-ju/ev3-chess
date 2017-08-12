@@ -17,7 +17,7 @@ public class TouchCaptor implements MainThreadListener {
 	
 	private NXTTouchSensor mySensor;
 	private float[] mySample;
-	private boolean myLastState;
+	private boolean myLastState = true;
 	
 	/**
 	 * Crée un capteur au port donné.
@@ -37,21 +37,36 @@ public class TouchCaptor implements MainThreadListener {
 	{
 		myListeners.add(listener);
 	}
-
+	
+	/**
+	 * @return true si le capteur est enfoncé
+	 */
+	public boolean isPressed()
+	{
+		onCall();
+		return myLastState;
+	}
+	
 	@Override
 	public void onCall()
 	{
 		mySensor.fetchSample(mySample, 0);
-		if(mySample[0] == 0 && myLastState == true)
+		if(mySample[0] == 0)
 		{
-			for(TouchCaptorListener listener : myListeners)
-				listener.onUnPush(this);
+			if(myLastState == true)
+			{
+				for(TouchCaptorListener listener : myListeners)
+					listener.onUnPush(this);
+			}
 			myLastState = false;
 		}
-		else if(mySample[0] == 1 && myLastState == false)
+		else if(mySample[0] == 1)
 		{
-			for(TouchCaptorListener listener : myListeners)
-				listener.onPush(this);
+			if(myLastState == false)
+			{
+				for(TouchCaptorListener listener : myListeners)
+					listener.onPush(this);
+			}
 			myLastState = true;
 		}
 	}

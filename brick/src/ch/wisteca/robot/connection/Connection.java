@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ch.wisteca.robot.MainClass;
 import ch.wisteca.robot.MainThreadListener;
+import lejos.hardware.Sound;
 
 /**
  * Singleton qui s'occupe de la connexion avec le client de jeu.
@@ -30,7 +31,7 @@ public class Connection implements MainThreadListener {
 	 * Crée le singleton et fais attendre le thread jusqu'à  la connexion d'un client. Si cette méthode
 	 * est appelée une 2eme fois, elle déconnectera le client actuelle et attendra une nouvelle connexion.
 	 */
-	public static void connect()
+	public static void create()
 	{
 		try {
 			
@@ -52,12 +53,13 @@ public class Connection implements MainThreadListener {
 		return myInstance;
 	}
 	
-	private Connection() throws IOException 
+	public void connect() throws IOException
 	{
 		@SuppressWarnings("resource")
 		ServerSocket server = new ServerSocket(4000);
 		
 		System.out.println("En attente de connexion...");
+		Sound.beepSequenceUp();
 		myClient = server.accept();
 		
 		MainClass.addListener(this);
@@ -170,9 +172,9 @@ public class Connection implements MainThreadListener {
 					myDataReader.read(bytes);
 					
 					Packet packet = new Packet();
-					packet.myLettreDepart = (char) (97 + bytes[0]);
+					packet.myLettreDepart = ((int) bytes[0]) + 1;
 					packet.myNumDepart = ((int) bytes[1]) + 1;
-					packet.myLettreArrive = (char) (97 + bytes[2]);
+					packet.myLettreArrive = ((int) bytes[2]) + 1;
 					packet.myNumArrive = ((int) bytes[3]) + 1;
 					packet.myCapture = bytes[4] == 0 ? false : true;
 					 

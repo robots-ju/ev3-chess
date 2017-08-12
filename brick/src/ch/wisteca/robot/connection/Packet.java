@@ -6,9 +6,9 @@ package ch.wisteca.robot.connection;
  */
 public class Packet {
 	
-	public char myLettreDepart;
+	public int myLettreDepart;
 	public int myNumDepart;
-	public char myLettreArrive;
+	public int myLettreArrive;
 	public int myNumArrive;
 	public boolean myCapture;
 	

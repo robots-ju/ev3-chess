@@ -3,11 +3,7 @@ package ch.wisteca.robot.motors;
 import java.io.IOException;
 
 import lejos.hardware.BrickFinder;
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.port.MotorPort;
-import lejos.hardware.port.SensorPort;
-import lejos.hardware.sensor.NXTTouchSensor;
-import lejos.hardware.sensor.SensorMode;
+import lejos.hardware.Sound;
 import lejos.remote.ev3.RemoteRequestEV3;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
@@ -26,34 +22,31 @@ public class YMotor extends Motor {
 
 	private RegulatedMotor	motorPince;
 	private RegulatedMotor motorDescendPince;
-	private RegulatedMotor motorPump;
+//	private RegulatedMotor motorPump;
 	
 	/// permet la connection à la seconde brique
 	private RemoteRequestEV3[] brique = new RemoteRequestEV3[1];
 
 	public YMotor() {
 		// connection à la seconde brique
-		
+		System.out.println("Connexion a la 2eme brique...");
 		try {
 			brique[0] = new RemoteRequestEV3(BrickFinder.find("EV2")[0].getIPAddress());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		motorPince = brique[0].createRegulatedMotor("A", 'L');
 		motorDescendPince = brique[0].createRegulatedMotor("B", 'L');
-		motorPump = brique[0].createRegulatedMotor("C", 'M');
+//		motorPump = brique[0].createRegulatedMotor("C", 'L');
 		
 		motorPince.setSpeed(100);
 		motorDescendPince.setSpeed(100);
 		//active le moteur de la pompe
-		motorPump.setSpeed(1200);
-		motorPump.forward();
-		// ouvre la pince
-		motorPince.rotate(-moveController);
-
-
+//		motorPump.setSpeed(1200);
+//		motorPump.forward();
+		System.out.println("Pump pump pump");
+		Sound.beepSequence();
 	}
 
 	/**
@@ -62,6 +55,7 @@ public class YMotor extends Motor {
 	public void clamp() {
 		// dessend le bras
 		// attends que la pince ouverte
+		motorPince.rotate(-moveController);
 		Delay.msDelay(100);
 		motorDescendPince.rotate(-moveController);
 		Delay.msDelay(100);
@@ -83,8 +77,11 @@ public class YMotor extends Motor {
 		Delay.msDelay(200);
 		// ouvre la pince
 		motorPince.rotate(-moveController);
-		// remonte le moteur
+		// remonte le bras
 		Delay.msDelay(100);
 		motorDescendPince.rotate(moveController);
+		// serre la pince
+		Delay.msDelay(200);
+		motorPince.rotate(moveController);
 	}
 }
