@@ -28,31 +28,23 @@ public class MotorController implements PacketListener {
 		
 		myYMotor = new YMotor();
 		myXZMotor = new XZMotor();
-		/*
-		myXZMotor.goTo(3, 6);
-		myYMotor.clamp();
-		myXZMotor.goTo(1, 3);
-		myYMotor.unclamp();*/
 	}
 	
 	@Override
 	public void packetReceived(Packet packet) 
 	{
-		System.out.println("start mouvement");
-		
 		if(packet.myCapture)
-		{System.out.println("pion a capturer");
+		{
 			myXZMotor.goTo(packet.myNumArrive, packet.myLettreArrive);
 			myYMotor.clamp();
 			myXZMotor.goTo(0, 0);
 			myYMotor.unclamp();
 		}
-		System.out.println("deplacement");
+		
 		myXZMotor.goTo(packet.myNumDepart, packet.myLettreDepart);
 		myYMotor.clamp();
 		myXZMotor.goTo(packet.myNumArrive, packet.myLettreArrive);
 		myYMotor.unclamp();
-		System.out.println("retour en 0;0");
 		myXZMotor.goTo(0, 0);
 		Connection.getInstance().sendPacket("1");
 	}

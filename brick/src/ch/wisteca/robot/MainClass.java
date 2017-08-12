@@ -21,7 +21,6 @@ public class MainClass  {
 		Connection.getInstance().addListener(new MotorController());
 		System.out.println("Retour en 0;0 termine");
 		Connection.getInstance().connect();
-		System.out.println("Connexion terminee");
 	}
 	
 	/**
