@@ -21,6 +21,18 @@ const BrickControl = require('./brick-control')
     // SOCKET.IO
     const socket = io.listen(httpServer);
     
+    const doBrickMoves = async () => {
+            for (let move of chessEngine.brickMoves()) {
+                console.log('Sending move to brick', move)
+                try {
+                    await brickControl.move(move)
+                } catch(err) {
+                    console.log('Brick move error', err)
+                }
+                console.log('Brick is finished')
+            }
+    }
+
     socket.on('connection', client => {
         client.emit('gameChange', {
             fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -29,19 +41,13 @@ const BrickControl = require('./brick-control')
             console.log('Player moved')
             client.emit('gameChange', { fen: await chessEngine.playerMove(move) })
 
-            for (let move of chessEngine.brickMoves()) {
-                console.log('Sending move to brick', move)
-                try {
-                    await brickControl.move(move);
-                } catch(err) {
-                    console.log('Brick move error', err)
-                }
-                console.log('Brick is finished')
-            }
+            await doBrickMoves()
 
             // ROBOT PLAYS AFTER THE PLAYER
             const fen = await chessEngine.computeRobotMove()
             client.emit('gameChange', { fen })
+
+            await doBrickMoves()
         })
         console.log('Client connected')
     })
